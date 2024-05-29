@@ -1,0 +1,20 @@
+.email-field label,
+.username-field label,
+.password-field label{
+    font-weight: 600;
+}
+
+.password-field div{
+    display: flex;
+    align-items: center;
+}
+.password-field div input{
+    width: 100%;
+}
+
+
+
+
+form div small{
+    color: red;
+}

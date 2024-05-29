@@ -1,0 +1,18 @@
+.active-menu{
+    border-radius: 16px;
+    border: 2px solid #E1E8FF;
+
+}
+
+.active-menu div div{
+    background-color: #E1E8FF;
+    border-radius: 13px;
+}
+
+
+.active-menu div span{
+    color: #003CFF;
+
+}
+
+

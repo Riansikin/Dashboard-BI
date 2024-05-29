@@ -1,0 +1,14 @@
+.box-login{
+    border-radius: 4px;
+
+    box-shadow: 0px 6px 8px 0px rgba(0,0,0,0.05);
+}
+
+#password .p-icon {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    top: 0;
+}
+
+

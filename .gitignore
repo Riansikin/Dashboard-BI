@@ -1,0 +1,12 @@
+# Ignore node_modules directories
+*/node_modules/
+
+# Ignore .env files
+*.env
+
+# Ignore .bat files
+*.bat
+
+
+#Ignore 
+**/package-lock.json
