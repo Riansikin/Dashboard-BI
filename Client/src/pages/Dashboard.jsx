@@ -118,7 +118,7 @@ const Dashboard = () => {
             } else if (rowData.status === 'Ditolak') {
                 return (
                     <Button 
-                        label="Action" 
+                        label="Update" 
                         icon="pi pi-spin pi-cog" 
                         className="w-full"
                         disabled
@@ -220,7 +220,7 @@ const Dashboard = () => {
                     popupAlignment="right" 
                 />
                 <Button 
-                    label="Action" 
+                    label="Update" 
                     icon="pi pi-spin pi-cog" 
                     className="w-full"
                     onClick={(event) => menuRefs.current[rowData.nomor_kontrak].toggle(event)}
@@ -287,9 +287,9 @@ const Dashboard = () => {
                         <Column field="nama_pekerjaan" header="Nama Pekerjaan" style={{ minWidth: '12rem' }} />
                         <Column field="nama_rekanan" header="Nama Rekanan" style={{ minWidth: '12rem' }}  />
                         <Column field="status" header="Status" style={{ minWidth: '12rem' }} body={statusBodyTemplate}/>
-                        <Column header="Mulai"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateStart}/>
-                        <Column header="Akhir"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateEnd}/>
-                        <Column header="Dana" dataType="numeric" style={{ minWidth: '10rem' }} body={balanceBodyTemplate} />
+                        <Column header="Mulai Kontrak"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateStart}/>
+                        <Column header="Akhir Kontrak"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateEnd}/>
+                        <Column header="Nilai Kontrak" dataType="numeric" style={{ minWidth: '10rem' }} body={balanceBodyTemplate} />
                         <Column header="Action"  body={actionBodyTemplate} style={{ minWidth: '10rem' }} />                      
                     </DataTable>                    
                 </div>

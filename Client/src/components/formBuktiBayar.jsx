@@ -155,7 +155,7 @@ const BuktiBayarForm = ({toast, id, handleSubmit, setValue, control, errors, get
                 </div>
 
                 <div className="nama-renkanan-field flex flex-column gap-1">
-                    <label htmlFor="status">Status</label>
+                    <label htmlFor="status">Update</label>
                     <Controller
                         name="status"
                         control={control}

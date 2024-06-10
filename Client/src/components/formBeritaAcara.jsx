@@ -159,14 +159,14 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
                 {/* Status (for editing only) */}
                 {isEdit && (
                     <div className="nama-renkanan-field flex flex-column gap-1">
-                        <label htmlFor="status">Status</label>
+                        <label htmlFor="status">Update</label>
                         <Controller
                             name="status"
                             control={control}
                             rules={{ required: 'status is required' }}
                             render={({ field }) => (
                                 <>  
-                                    <InputText {...field} disabled={field.value === 'Ditolak' || field.value === 'Diterima'}/>
+                                    <InputText {...field} disabled={field.value === 'Ditolak' || field.value === 'Selesai'}/>
                                     <small>{errors.status && <span>{errors.status.message}</span>}</small>
                                 </>
                         )}/>
@@ -177,7 +177,7 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
                 {!isEdit && <Button label="Success" severity="success" />}
 
                 {/* Update Button (for editing) */}
-                {(isEdit && status !== 'Diterima' && status !== 'Ditolak') && <Button label="Update" severity="success" /> }
+                {(isEdit && status !== 'Selesai' && status !== 'Ditolak') && <Button label="Update" severity="success" /> }
             </div>
         </form>
     );

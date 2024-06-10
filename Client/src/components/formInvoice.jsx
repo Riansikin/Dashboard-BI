@@ -169,7 +169,7 @@ const FormInovice = ({toast, id, handleSubmit, setValue, control, errors, handle
                             rules={{ required: 'status is required' }}
                             render={({ field }) => (
                                 <>  
-                                    <InputText {...field} disabled={field.value === 'Ditolak' || field.value === 'Diterima'}/>
+                                    <InputText {...field} disabled={field.value === 'Ditolak' || field.value === 'Selesai'}/>
                                     <small>{errors.status && <span>{errors.status.message}</span>}</small>
                                 </>
                         )}/>
@@ -180,7 +180,7 @@ const FormInovice = ({toast, id, handleSubmit, setValue, control, errors, handle
                 {!isEdit && <Button label="Success" severity="success" />}
 
                 {/* Update Button (for editing) */}
-                {(isEdit && status !== 'Diterima' && status !== 'Ditolak') && <Button label="Update" severity="success" /> }
+                {(isEdit && status !== 'Selesai' && status !== 'Ditolak') && <Button label="Update" severity="success" /> }
             </div>
         </form>
     );

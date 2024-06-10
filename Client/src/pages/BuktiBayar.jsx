@@ -108,11 +108,11 @@ export default function BuktiBayar({match}){
                     
 
                     return;
-                }else if ( beritaAcaraResponse.response.status !== "Diterima"){
+                }else if ( beritaAcaraResponse.response.status !== "Selesai"){
                     toast.current.show({
                         severity: 'error', 
                         summary: 'Error', 
-                        detail: "Proses Belum Dalam status 'Diterima'" 
+                        detail: "Proses Belum Dalam status 'Selesai'" 
                     });
 
                     setTimeout(() => {
