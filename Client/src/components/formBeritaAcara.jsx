@@ -12,6 +12,19 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
     return (
         <form className="w-11 flex flex-column lg:flex-row p-1 lg:p-3" onSubmit={handleSubmit} style={{ background: '#FFFFFF' }}>
             <div className="left-form p-2 flex flex-column gap-3 flex-grow-1">
+                <div className="nomor-kontrak-field flex flex-column gap-1 ">
+                    <label htmlFor="nomor_kontrak">Nomor Kontrak</label>
+                    <Controller
+                        name="nomor_kontrak"
+                        control={control}
+                        rules={{ required: 'NNomor Kontrak is required' }}
+                        render={({ field }) => (
+                            <>
+                                <InputText {...field} disabled={isEdit} />
+                                <small>{errors.nomor_kontrak && <span>{errors.nomor_kontrak.message}</span>}</small>
+                            </>
+                    )}/>
+                </div>
                 {/* Nama Rekanan */}
                 <div className="nama-renkanan-field flex flex-column gap-1">
                     <label htmlFor="nama_rekanan">Nama Rekanan</label>
@@ -111,7 +124,22 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
             </div>
 
             <div className="rigth-form p-2 flex  flex-column gap-3 flex-grow-1">
-                {/* Tanggal Mulai*/}
+                {/* Jangka Waktu */}
+                <div className="jangka-waktu-field flex flex-column gap-1">
+                    <label htmlFor="jangka_waktu">Jangka Waktu</label>
+                    <Controller
+                        name="jangka_waktu"
+                        control={control}
+                        rules={{ required: 'Jangka waktu is required' }}
+                        render={({ field }) => (
+                            <>
+                                <InputNumber value={field.value} onChange={(e) => setValue('jangka_waktu', e.value)}  prefix="Pengerjaan Selama " suffix=" Bulan" disabled={isEdit} />
+                                <small>{errors.jangka_waktu && <span>{errors.jangka_waktu.message}</span>}</small>
+                            </>
+                    )}/>
+                </div>
+
+                {/* Tanggal Mulai */}
                 <div className="tanngal-mulai-field flex flex-column gap-1">
                     <label htmlFor="tanngal-mulai">Tanggal Mulai</label>
                     <Controller
@@ -122,21 +150,6 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
                             <>
                                 <Calendar id="calendar-24h" value={field.value} onChange={(e) => setValue('tanggal_mulai', e.value)} showTime hourFormat="24" disabled={isEdit}/>
                                 <small>{errors.tanggal_mulai && <span>{errors.tanggal_mulai.message}</span>}</small>
-                            </>
-                    )}/>
-                </div>
-
-                {/* Tanggal Akhir */}
-                <div className="tanngal-akhir-field flex flex-column gap-1">
-                    <label htmlFor="tanngal-akhir">Tanggal Akhir</label>
-                    <Controller
-                        name="tanggal_akhir" 
-                        control={control}
-                        rules={{ required: 'Tanggal Akhir is required' }}
-                        render={({ field }) => (
-                            <>
-                                <Calendar id="calendar-24h" value={field.value} onChange={(e) => setValue('tanggal_akhir', e.value)} showTime hourFormat="24" disabled={isEdit}/>
-                                <small>{errors.tanggal_akhir && <span>{errors.tanggal_akhir.message}</span>}</small>
                             </>
                     )}/>
                 </div>
@@ -159,7 +172,7 @@ const FormBeritaAcara = ({toast, id, handleSubmit, setValue, control, errors, ha
                 {/* Status (for editing only) */}
                 {isEdit && (
                     <div className="nama-renkanan-field flex flex-column gap-1">
-                        <label htmlFor="status">Update</label>
+                        <label htmlFor="status">Status</label>
                         <Controller
                             name="status"
                             control={control}

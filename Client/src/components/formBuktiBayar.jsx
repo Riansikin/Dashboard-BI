@@ -114,6 +114,20 @@ const BuktiBayarForm = ({toast, id, handleSubmit, setValue, control, errors, get
             </div>
 
             <div className="rigth-form p-2 flex  flex-column gap-3 flex-grow-1">
+                <div className="jangka-waktu-field flex flex-column gap-1">
+                    <label htmlFor="jangka_waktu">Jangka Waktu</label>
+                    <Controller
+                        name="jangka_waktu"
+                        control={control}
+                        rules={{ required: 'Jangka waktu is required' }}
+                        render={({ field }) => (
+                            <>
+                                <InputNumber {...field}  prefix="Pengerjaan Selama " suffix=" Bulan" disabled={!!id} />
+                                <small>{errors.jangka_waktu && <span>{errors.jangka_waktu.message}</span>}</small>
+                            </>
+                    )}/>
+                </div>
+
                 <div className="tanngal-mulai-field flex flex-column gap-1">
                     <label htmlFor="tanngal-mulai">Tanggal Mulai</label>
                     <Controller
@@ -124,19 +138,6 @@ const BuktiBayarForm = ({toast, id, handleSubmit, setValue, control, errors, get
                             <>
                                 <Calendar id="calendar-24h" {...field} showTime hourFormat="24" disabled={!!id}/>
                                 <small>{errors.tanggal_mulai && <span>{errors.tanggal_mulai.message}</span>}</small>
-                            </>
-                    )}/>
-                </div>
-                <div className="tanngal-akhir-field flex flex-column gap-1">
-                    <label htmlFor="tanngal-akhir">Tanggal Akhir</label>
-                    <Controller
-                        name="tanggal_akhir" 
-                        control={control}
-                        rules={{ required: 'Tanggal Akhir is required' }}
-                        render={({ field }) => (
-                            <>
-                                <Calendar id="calendar-24h" value={field.value} onChange={(e) => setValue('tanggal_akhir', e.value)} showTime hourFormat="24" disabled={isEdit}/>
-                                <small>{errors.tanggal_akhir && <span>{errors.tanggal_akhir.message}</span>}</small>
                             </>
                     )}/>
                 </div>
@@ -155,7 +156,7 @@ const BuktiBayarForm = ({toast, id, handleSubmit, setValue, control, errors, get
                 </div>
 
                 <div className="nama-renkanan-field flex flex-column gap-1">
-                    <label htmlFor="status">Update</label>
+                    <label htmlFor="status">Status</label>
                     <Controller
                         name="status"
                         control={control}

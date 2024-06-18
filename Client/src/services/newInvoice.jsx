@@ -15,6 +15,7 @@ const newInvoice = async (data) => {
             credentials: 'include',
         });
         const formData = new FormData();
+        formData.append("nomor_invoice", data.nomor_invoice);
         formData.append("nama_rekanan", data.nama_rekanan);
         formData.append("nama_pekerjaan", data.nama_pekerjaan);
         formData.append("nilai_kontrak", data.nilai_kontrak);

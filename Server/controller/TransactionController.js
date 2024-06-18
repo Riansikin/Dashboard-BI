@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const jwt = require("jsonwebtoken");
 const collectionName = "berita_acara";
+const encrypt = require('../utils/ecnrypt');
 const AudithLog = require("../model/AudithLog");
 const UserModel = require("../model/UserModel");
 const BeritaAcaraModel = require("../model/BeritaAcaraModel");
@@ -10,13 +11,13 @@ module.exports = {
   createBeritaAcara: async (req, res) => {
     try {
       const {
+        nomor_kontrak,
         nama_rekanan,
         nama_pekerjaan,
         nilai_kontrak,
-        tanggal_mulai,
-        tanggal_akhir,
-        nilai_tagihan
-
+        jangka_waktu,
+        nilai_tagihan,
+        tanggal_mulai
       } = req.body;
 
       const { id } = req.userData;
@@ -31,19 +32,31 @@ module.exports = {
       }
 
       const { filename: fileName } = req.file;
-      const nomor_kontrak = req.file.filename.split("_")[0];
+      // const nomor_kontrak = req.file.filename.split("_")[0];
 
-      const mulai = new Date(tanggal_mulai);
-      const akhir = new Date(tanggal_akhir);
+      const isNomorKontrakExist = await BeritaAcaraModel.findOne( { nomor_kontrak } );
+
+      if(isNomorKontrakExist){
+        console.log("POST /new-berita-acara --- Bad Request (400)");
+        return res.status(400).json({ 
+          status: 400, 
+          msg: "Bad Request",
+          show_msg :`Nomor kontrak '${nomor_kontrak}' sudah ada`,
+        });
+      }
+
+      const akhirDate = new Date(tanggal_mulai);
+      akhirDate.setDate(akhirDate.getDate() + jangka_waktu * 30);
       
       const newTransaction = new BeritaAcaraModel({
         nama_rekanan,
         nama_pekerjaan,
         nomor_kontrak,
         nilai_kontrak,
+        jangka_waktu,
         periode_penagihan: {
-          mulai,
-          akhir,
+          mulai: tanggal_mulai,
+          akhir: akhirDate
         },
         nilai_tagihan,
         dokumen: "/assets/document/berita_acara/" + fileName,
@@ -87,21 +100,28 @@ module.exports = {
 
   getAllBeritaAcara: async (req, res) => {
     try {
-      const beritaAcara = await BeritaAcaraModel.find({}, { _id: 0, dokumen: 0 });
+      const Response = await BeritaAcaraModel.find({}, { _id: 0, dokumen: 0 });
       const users = await UserModel.find({}, { _id: 1, email: 1 });
 
       const userMap = new Map(users.map((user) => [user._id.toString(), user.email]));
-      const beritaAcaraWithUserName = beritaAcara.map((berita) => ({
-        ...berita.toObject(),
-        created_by: userMap.get(berita.created_by.toString()) || "Unknown",
-      }));
-
+      const beritaAcara = Response.map(item => {
+        const itemObject = item.toObject();
+        return {
+          ...itemObject,
+          nomor_kontrak : encrypt.encryptData(item.nomor_kontrak),
+          created_by: userMap.get(item.created_by.toString()) || "Unknown",
+        }
+      })
+      // const beritaAcara = Response.map((berita) => ({
+      //   ...berita.toObject(),
+      //   created_by: userMap.get(berita.created_by.toString()) || "Unknown",
+      // }));
       console.log("GET /get-all-berita-acara --- Success (200)");
 
       return res.status(200).json({
         status: 200,
         msg: "Success",
-        data: beritaAcaraWithUserName,
+        data: beritaAcara,
       });
     } catch (error) {
 
@@ -118,8 +138,7 @@ module.exports = {
     }
   },
   getBeritaAcarabyId: async (req, res) => {
-    const { id } = req.params;
-
+    const id  = encrypt.decryptData(req.params.id);
     try {
       const data = await BeritaAcaraModel.findOne(
         { nomor_kontrak: id },
@@ -160,7 +179,7 @@ module.exports = {
   },
 
   updatedBertiaAcarabyId: async (req, res) => {
-    const { id } = req.params;
+    const id  = encrypt.decryptData(req.params.id);
     const { email, newStatus } = req.body;
 
     try {
@@ -231,8 +250,8 @@ module.exports = {
   },
 
   downloadFileBeritaAcara: async (req, res) => {
-    const { id } = req.params;
-
+    
+    const id  = encrypt.decryptData(req.params.id);
     try {
       const BeritaAcaraData = await BeritaAcaraModel.findOne({ nomor_kontrak: id });
 

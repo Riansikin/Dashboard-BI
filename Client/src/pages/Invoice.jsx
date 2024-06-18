@@ -12,7 +12,7 @@ import SideBarRes from "../components/sideBarRes.jsx";
 import updateStatusInvoice from "../services/updateStatusInvoice.jsx";
 import getInvoice from "../services/getInvoice.jsx";
 import ExportInvoice from "../services/exportinvoice.jsx";
-
+import { encryptAES } from "../utils/cryptoUtils.js";
 
 const Invoice = () =>{
     const [visible, setVisible] = useState(false);
@@ -67,14 +67,14 @@ const Invoice = () =>{
         return <Tag value={rowData.status} severity={getSeverity(rowData.status)} />;
     };
 
-    const handleUpdateProses = (rowData) => {
-        window.location.href = `/invoice/${rowData.nomor_invoice}`;
+    const handleUpdateProses = (data) => {
+        window.location.href = `/invoice/${data}`;
     };
 
 
-    const finalStatus = async (rowData, newStatus) => {
+    const finalStatus = async (data, newStatus) => {
         try {
-            const response = await updateStatusInvoice(rowData.nomor_invoice, user.email, newStatus);
+            const response = await updateStatusInvoice(data, user.email, newStatus);
 
             toast.current.show({ 
                 severity: response.status, 
@@ -100,7 +100,7 @@ const Invoice = () =>{
 
     const actionBodyTemplate = (rowData) => {
         let items;
-
+        const NI_AES = encryptAES(rowData.nomor_invoice);
         if (user.role === 'Super Admin' || user.role === 'Admin') {
             if (rowData.status === 'Selesai') {
                 items = [
@@ -111,7 +111,7 @@ const Invoice = () =>{
                                 label: 'Detail invoice',
                                 icon: 'pi pi-reply',
                                 command: () => {
-                                    window.location.href = `/invoice/${rowData.nomor_invoice}`;
+                                    window.location.href = `/invoice/${NI_AES}`;
                                 },
                             },
                         ],
@@ -134,7 +134,7 @@ const Invoice = () =>{
                             {
                                 label: 'Update Proses',
                                 icon: 'pi pi-reply',
-                                command: () => handleUpdateProses(rowData),
+                                command: () => handleUpdateProses(NI_AES),
                             },
                         ],
                     },
@@ -144,12 +144,12 @@ const Invoice = () =>{
                             {
                                 label: 'Selesai',
                                 icon: 'pi pi-verified',
-                                command: () => finalStatus(rowData, 'Selesai'),
+                                command: () => finalStatus(NI_AES, 'Selesai'),
                             },
                             {
                                 label: 'Tolak',
                                 icon: 'pi pi-ban',
-                                command: () => finalStatus(rowData, 'Ditolak'),
+                                command: () => finalStatus(NI_AES, 'Ditolak'),
                             },
                         ],
                     },
@@ -175,7 +175,7 @@ const Invoice = () =>{
                                 label: 'Detail invoice',
                                 icon: 'pi pi-reply',
                                 command: () => {
-                                    window.location.href = `/invoice/${rowData.nomor_invoice}`;
+                                    window.location.href = `/invoice/${NI_AES}`;
                                 },
                             },
                         ],
@@ -215,16 +215,16 @@ const Invoice = () =>{
                     pt={{ action: { className: 'gap-2' } }} 
                     model={items} 
                     popup 
-                    ref={(el) => menuRefs.current[rowData.nomor_invoice] = el} 
-                    id={`popup_menu_${rowData.nomor_invoice}`} 
+                    ref={(el) => menuRefs.current[NI_AES] = el} 
+                    id={`popup_menu_${NI_AES}`} 
                     popupAlignment="right" 
                 />
                 <Button 
-                    label="Action" 
+                    label="Update" 
                     icon="pi pi-spin pi-cog" 
                     className="w-full"
-                    onClick={(event) => menuRefs.current[rowData.nomor_invoice].toggle(event)}
-                    aria-controls={`popup_menu_${rowData.nomor_invoice}`} 
+                    onClick={(event) => menuRefs.current[NI_AES].toggle(event)}
+                    aria-controls={`popup_menu_${NI_AES}`} 
                     aria-haspopup
                 />
             </>
@@ -261,13 +261,12 @@ const Invoice = () =>{
                     <InputText value={namarekanan} onChange={namarekananOnChange} placeholder="Search Nama Rekanan"  />
                 </span>
 
-                {user.role !== 'Vendor' && (
                     <div  className="w-3 md:w-4 flex gap-2">
                         <Button label="Invoice" severity="Primary" icon="pi pi-plus" onClick={() => { window.location.href = '/invoice/new';}} className="w-6"/>
+                {user.role !== 'Vendor' && (
                         <Button label="Export" severity="success" icon="pi pi-download" onClick={handleExprotInvoice} className="w-6"/>
+                    )}
                     </div>
-                    
-                )}
                 
             </div>
         );
@@ -290,10 +289,10 @@ const Invoice = () =>{
                         <Column field="nama_pekerjaan" header="Nama Pekerjaan" style={{ minWidth: '12rem' }} />
                         <Column field="nama_rekanan" header="Nama Rekanan" style={{ minWidth: '12rem' }}  />
                         <Column field="status" header="Status" style={{ minWidth: '12rem' }} body={statusBodyTemplate}/>
-                        <Column header="Mulai"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateStart}/>
-                        <Column header="Akhir"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateEnd}/>
-                        <Column header="Dana" dataType="numeric" style={{ minWidth: '10rem' }} body={balanceBodyTemplate} />
-                        <Column header="Action"  body={actionBodyTemplate} style={{ minWidth: '10rem' }} />                      
+                        <Column header="Mulai Kontrak"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateStart}/>
+                        <Column header="Akhir Kontrak"  dataType="date" style={{ minWidth: '10rem' }} body={dateBodyTemplateEnd}/>
+                        <Column header="Nilai Kontrak" dataType="numeric" style={{ minWidth: '10rem' }} body={balanceBodyTemplate} />
+                        <Column header="Update"  body={actionBodyTemplate} style={{ minWidth: '10rem' }} />                      
                     </DataTable>                    
                 </div>
             </main>

@@ -31,16 +31,18 @@ const invoiceValidate = (data, callback) => {
             'any.required': 'Tanggal Mulai tidak boleh kosong',
             'date.iso': 'Tanggal Mulai tidak sesuai format',
         }),
-
         tanggal_akhir: Joi.date().required().iso().custom(isValidDateLaterThanStart).messages({
             'tanggal_akhir.date' : 'test',
             'any.required': 'Tanggal Akhir tidak boleh kosong',
             'date.iso': 'Tanggal Akhir tidak sesuai format',
             'date.custom' : 'Tanggal harus lebih dari tanggal mulai',
         }),
-
         nilai_tagihan: Joi.string().required().messages({
             'any.required': 'Nilai tagihan tidak boleh kosong',
+        }),
+        nomor_invoice: Joi.string().required().pattern(/^[a-zA-Z0-9\s!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]*$/).messages({
+            'any.required': 'Nomor Invoice tidak boleh kosong',
+            'string.pattern.base': 'Nomor invoice hanya boleh berisi angka, huruf, dan simbol',
         }),
         
     });

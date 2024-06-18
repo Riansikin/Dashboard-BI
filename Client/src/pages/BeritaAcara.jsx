@@ -13,6 +13,9 @@ import updateStatusBeritaAcara from "../services/updateStatusBeritaAcara.jsx";
 import DownloadBeritaAcara from "../services/downloadBeritaAcara.jsx";
 
 import FormBeritaAcara from "../components/formBeritaAcara.jsx";
+import { encryptAES } from "../utils/cryptoUtils.js";
+
+
 
 
 export default function BeritaAcara({match}){
@@ -27,9 +30,9 @@ export default function BeritaAcara({match}){
             nama_rekanan : '',
             nama_pekerjaan : '',
             nilai_kontrak : null,
+            jangka_waktu : null,
             nilai_tagihan : null,
             tanggal_mulai : '',
-            tanggal_akhir : '',
             status : '',
             dokumen_bukti : null,
             dokumen : null,
@@ -44,12 +47,13 @@ export default function BeritaAcara({match}){
                     const data = dataBeritaAcara.response;
                     const dokumen = dataBeritaAcara.response.dokumen.split("/")[4];
 
+                    setValue('nomor_kontrak', data.nomor_kontrak);
                     setValue('nama_rekanan', data.nama_rekanan);
                     setValue('nama_pekerjaan', data.nama_pekerjaan);
                     setValue('nilai_kontrak', data.nilai_kontrak);
+                    setValue('jangka_waktu', data.jangka_waktu);
                     setValue('nilai_tagihan', data.nilai_tagihan);
                     setValue('tanggal_mulai', new Date(data.periode_penagihan.mulai));
-                    setValue('tanggal_akhir', new Date(data.periode_penagihan.akhir));
                     setValue('dokumen', dokumen);
                     setValue('status', data.status);
 
@@ -61,8 +65,10 @@ export default function BeritaAcara({match}){
         }
     }, [id]);
 
-    const handleDownload = () => {
-        DownloadBeritaAcara(id);
+    const handleDownload = async () => {
+        const response  = await DownloadBeritaAcara(id);
+
+        toast.current.show({ severity: response.status, summary: response.status === 'error' ? 'Error' : 'Success', detail: response.response });
     }
 
     const onSubmit = async (data) => {

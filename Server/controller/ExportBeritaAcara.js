@@ -38,6 +38,7 @@ const exportPDFController = async (req, res) => {
                 "Nama Rekanan",
                 "Nama Pekerjaan",
                 "Nilai Kontrak",
+                "Jangka Waktu",
                 "Tanggal Mulai",
                 "Tanggal Akhir",
                 "Status"
@@ -51,6 +52,7 @@ const exportPDFController = async (req, res) => {
                 item.nama_rekanan, 
                 item.nama_pekerjaan,
                 item.nilai_kontrak, 
+                `${item.jangka_waktu} Bulan`,
                 formatDate(item.periode_penagihan.mulai),
                 formatDate(item.periode_penagihan.akhir),
                 item.status,

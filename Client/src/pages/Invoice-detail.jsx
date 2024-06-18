@@ -43,7 +43,8 @@ export default function InvoiceDetail({match}){
                 .then(dataInvoice => {
                     const data = dataInvoice.response;
                     const dokumen = dataInvoice.response.dokumen.split("/")[4];
-
+                    
+                    setValue('nomor_invoice', data.nomor_invoice);
                     setValue('nama_rekanan', data.nama_rekanan);
                     setValue('nama_pekerjaan', data.nama_pekerjaan);
                     setValue('nilai_kontrak', data.nilai_kontrak);
@@ -61,8 +62,9 @@ export default function InvoiceDetail({match}){
         }
     }, [id]);
 
-    const handleDownload = () => {
-        DownloadInvoice(id);
+    const handleDownload = async () => {
+        const response  = await DownloadInvoice(id);
+        toast.current.show({ severity: response.status, summary: response.status === 'error' ? 'Error' : 'Success', detail: response.response });
     }
 
     const onSubmit = async (data) => {

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const jwt = require("jsonwebtoken");
 const collectionName = "invoice";
+const encrypt = require('../utils/ecnrypt');
 const AudithLog = require("../model/AudithLog");
 const UserModel = require("../model/UserModel");
 const InvoiceModel = require("../model/Invoice");
@@ -11,6 +12,7 @@ module.exports = {
     createInovice : async (req, res) => {
         try {
             const {
+                nomor_invoice,
                 nama_rekanan,
                 nama_pekerjaan,
                 nilai_kontrak,
@@ -31,7 +33,17 @@ module.exports = {
             }
 
             const { filename: fileName } = req.file;
-            const nomor_invoice = req.file.filename.split("_")[0];
+            // const nomor_invoice = req.file.filename.split("_")[0];
+
+            const isNomorInvoiceExist = await InvoiceModel.findOne( {nomor_invoice} );
+
+            if(isNomorInvoiceExist){
+              return res.status(400).json({ 
+                status: 400, 
+                msg: "Bad Request",
+                show_msg :`Nomor Invoice '${nomor_invoice}' sudah ada`,
+              });
+            }
 
             const mulai = new Date(tanggal_mulai);
             const akhir = new Date(tanggal_akhir);
@@ -90,21 +102,25 @@ module.exports = {
 
     getAllinvoice: async (req, res) => {
         try {
-          const Invoice = await InvoiceModel.find({}, { _id: 0});
+          const Response = await InvoiceModel.find({}, { _id: 0});
           const users = await UserModel.find({}, { _id: 1, email: 1 });
     
           const userMap = new Map(users.map((user) => [user._id.toString(), user.email]));
-          const InvoiceWithUserName = Invoice.map((item) => ({
-            ...item.toObject(),
-            created_by: userMap.get(item.created_by.toString()) || "Unknown",
-          }));
+          const Invoice = Response.map(item => {
+            const itemObj = item.toObject();
+            return {
+              ...itemObj,
+              nomor_invoice : encrypt.encryptData(item.nomor_invoice),
+              created_by: userMap.get(item.created_by.toString()) || "Unknown",
+            }
+          });
     
           console.log("GET /invoice --- Success (200)");
     
           return res.status(200).json({
             status: 200,
             msg: "Success",
-            data: InvoiceWithUserName,
+            data: Invoice,
           });
         } catch (error) {
     
@@ -123,7 +139,7 @@ module.exports = {
 
 
       getInvoicebyId: async (req, res) => {
-        const { id } = req.params;
+        const id  = encrypt.decryptData(req.params.id);
         try {
           const data = await InvoiceModel.findOne(
             { nomor_invoice: id },
@@ -165,7 +181,7 @@ module.exports = {
 
 
       updatedInvoicebyId: async (req, res) => {
-        const { id } = req.params;
+        const id  = encrypt.decryptData(req.params.id);
         const { email, newStatus } = req.body;
     
         try {
@@ -236,7 +252,7 @@ module.exports = {
       },
 
       downloadFileInvoice: async (req, res) => {
-        const { id } = req.params;
+        const id  = encrypt.decryptData(req.params.id);
     
         try {
           const InvoiceData = await InvoiceModel.findOne({ nomor_invoice: id });

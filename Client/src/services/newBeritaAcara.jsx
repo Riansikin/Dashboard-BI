@@ -17,12 +17,13 @@ const newBeritaAcara = async (data) => {
             credentials: 'include',
         });
         const formData = new FormData();
+        formData.append("nomor_kontrak", data.nomor_kontrak);
         formData.append("nama_rekanan", data.nama_rekanan);
         formData.append("nama_pekerjaan", data.nama_pekerjaan);
         formData.append("nilai_kontrak", data.nilai_kontrak);
+        formData.append("jangka_waktu", data.jangka_waktu);
         formData.append("nilai_tagihan", data.nilai_tagihan);
         formData.append("tanggal_mulai", data.tanggal_mulai.toISOString());
-        formData.append("tanggal_akhir", data.tanggal_akhir.toISOString());
         formData.append("berita_acara", data.dokumen);
 
         const response = await instance.post("new-berita-acara", formData);

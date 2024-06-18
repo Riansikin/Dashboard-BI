@@ -1,6 +1,8 @@
 import axios from "axios";
 import refreshToken from "./resfreshToken";
 import { API } from "./config";
+import { decryptData } from "../utils/cryptoUtils";
+
 
 const getBeritaAcara = async (setBeritaAcara) => {
     try {
@@ -11,7 +13,11 @@ const getBeritaAcara = async (setBeritaAcara) => {
             }
         });
         if (response.status >= 200 && response.status <= 299) {
-            setBeritaAcara(response.data.data);
+            const decryptedData = response.data.data.map(item => ({
+                ...item,
+                nomor_kontrak: decryptData(item.nomor_kontrak)
+            }));
+            setBeritaAcara(decryptedData);
         }
     } catch (error) {
         console.error("Error : ",JSON.stringify(error.message));

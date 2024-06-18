@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const isValidDateLaterThan =  (value, helpers) => {
+const isValidDateLaterThanNow =  (value, helpers) => {
     const date = new Date(value);
     date.setHours(0, 0, 0, 0);
     const now = new Date();
@@ -10,7 +10,7 @@ const isValidDateLaterThan =  (value, helpers) => {
       return date;
     }
   
-    return helpers.message(`"Tanggal Akhir" harus lebih dari "Tanggal Mulai"`);
+    return helpers.message(`"tanggal_mulai" harus lebih dari tanggal sekarang`);
 };
 const beritaAcaraCreateValidation = (data, callback) => {
 
@@ -24,21 +24,23 @@ const beritaAcaraCreateValidation = (data, callback) => {
         nilai_kontrak: Joi.string().required().messages({
             'any.required': 'Nilai Kontrak tidak boleh kosong',
         }),
-        tanggal_mulai: Joi.date().required().iso().messages({
+        jangka_waktu: Joi.number().integer().positive().messages({
+            'number.integer': 'Jangka Waktu harus bilangan bulat',
+            'number.positive': 'Jangka Waktu harus lebih dari 0',
+            'any.required': 'Jangka waktu tidak boleh kosong',
+        }), 
+        tanggal_mulai: Joi.date().required().iso().custom(isValidDateLaterThanNow).messages({
             'tanggal_mulai.date' : 'test',
             'any.required': 'Tanggal Mulai tidak boleh kosong',
             'date.iso': 'Tanggal Mulai tidak sesuai format',
+            'date.custom': 'Tanggal harus lebih dari sekarang',
         }),
-    
-        tanggal_akhir: Joi.date().required().iso().custom(isValidDateLaterThan).messages({
-            'tanggal_akhir.date' : 'test',
-            'any.required': 'Tanggal Akhir tidak boleh kosong',
-            'date.iso': 'Tanggal Akhir tidak sesuai format',
-            'date.custom' : 'Tanggal harus lebih dari tanggal mulai',
-        }),
-        
         nilai_tagihan: Joi.string().required().messages({
             'any.required': 'Nilai tagihan tidak boleh kosong',
+        }),
+        nomor_kontrak: Joi.string().required().pattern(/^[a-zA-Z0-9\s!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]*$/).messages({
+            'any.required': 'Nomor kontrak tidak boleh kosong',
+            'string.pattern.base': 'Nomor kontrak hanya boleh berisi angka, huruf, dan simbol',
         }),
         
     });

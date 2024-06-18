@@ -12,6 +12,19 @@ const FormInovice = ({toast, id, handleSubmit, setValue, control, errors, handle
     return (
         <form className="w-11 flex flex-column lg:flex-row p-1 lg:p-3" onSubmit={handleSubmit} style={{ background: '#FFFFFF' }}>
             <div className="left-form p-2 flex flex-column gap-3 flex-grow-1">
+                <div className="nomor-invoice-field flex flex-column gap-1 ">
+                    <label htmlFor="nomor_invoice">Nomor Invoice</label>
+                    <Controller
+                        name="nomor_invoice"
+                        control={control}
+                        rules={{ required: 'NNomor invoice is required' }}
+                        render={({ field }) => (
+                            <>
+                                <InputText {...field} disabled={isEdit} />
+                                <small>{errors.nomor_invoice && <span>{errors.nomor_invoice.message}</span>}</small>
+                            </>
+                    )}/>
+                </div>
                 {/* Nama Rekanan */}
                 <div className="nama-renkanan-field flex flex-column gap-1">
                     <label htmlFor="nama_rekanan">Nama Rekanan</label>
@@ -129,7 +142,7 @@ const FormInovice = ({toast, id, handleSubmit, setValue, control, errors, handle
                 </div>
 
 
-                {/* Tanggal Akhir */}
+                {/* Tanggal Mulai */}
                 <div className="tanngal-akhir-field flex flex-column gap-1">
                     <label htmlFor="tanngal-akhir">Tanggal Akhir</label>
                     <Controller

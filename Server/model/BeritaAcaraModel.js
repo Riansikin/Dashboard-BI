@@ -19,6 +19,10 @@ const TransactionShcema = new Schema({
         type: String,
         required : true,
     },
+    jangka_waktu : {
+        type: Number,
+        required : true,
+    },
     periode_penagihan:{
         mulai: {
             type: Date,

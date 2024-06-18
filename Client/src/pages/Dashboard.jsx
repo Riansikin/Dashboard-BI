@@ -12,6 +12,7 @@ import SideBarRes from "../components/sideBarRes.jsx";
 import getBeritaAcara from "../services/getBeritaAcara.jsx";
 import updateStatusBeritaAcara from "../services/updateStatusBeritaAcara.jsx";
 import ExportBeritaAcara from "../services/exportBeritaAcara.jsx";
+import { encryptAES } from "../utils/cryptoUtils.js";
 
 const Dashboard = () => {
     const [visible, setVisible] = useState(false);
@@ -66,13 +67,13 @@ const Dashboard = () => {
         return <Tag value={rowData.status} severity={getSeverity(rowData.status)} />;
     };
 
-    const handleUpdateProses = (rowData) => {
-        window.location.href = `/berita-acara/${rowData.nomor_kontrak}`;
+    const handleUpdateProses = (data) => {
+        window.location.href = `/berita-acara/${data}`;
     };
     
-    const finalStatus = async (rowData, newStatus) => {
+    const finalStatus = async (data, newStatus) => {
         try {
-            const response = await updateStatusBeritaAcara(rowData.nomor_kontrak, user.email, newStatus);
+            const response = await updateStatusBeritaAcara(`${data}`, user.email, newStatus);
 
             toast.current.show({ 
                 severity: response.status, 
@@ -98,7 +99,7 @@ const Dashboard = () => {
 
     const actionBodyTemplate = (rowData) => {
         let items;
-
+        const NK_AES = encryptAES(rowData.nomor_kontrak);
         if (user.role === 'Super Admin' || user.role === 'Admin') {
             if (rowData.status === 'Selesai') {
                 items = [
@@ -109,7 +110,7 @@ const Dashboard = () => {
                                 label: 'Bukti Bayar',
                                 icon: 'pi pi-reply',
                                 command: () => {
-                                    window.location.href = `/bukti-bayar/${rowData.nomor_kontrak}`;
+                                    window.location.href = `/bukti-bayar/${NK_AES}`;
                                 },
                             },
                         ],
@@ -118,7 +119,7 @@ const Dashboard = () => {
             } else if (rowData.status === 'Ditolak') {
                 return (
                     <Button 
-                        label="Update" 
+                        label="Action" 
                         icon="pi pi-spin pi-cog" 
                         className="w-full"
                         disabled
@@ -132,7 +133,7 @@ const Dashboard = () => {
                             {
                                 label: 'Update Proses',
                                 icon: 'pi pi-reply',
-                                command: () => handleUpdateProses(rowData),
+                                command: () => handleUpdateProses(NK_AES),
                             },
                         ],
                     },
@@ -142,12 +143,12 @@ const Dashboard = () => {
                             {
                                 label: 'Selesai',
                                 icon: 'pi pi-verified',
-                                command: () => finalStatus(rowData, 'Selesai'),
+                                command: () => finalStatus(NK_AES, 'Selesai'),
                             },
                             {
                                 label: 'Tolak',
                                 icon: 'pi pi-ban',
-                                command: () => finalStatus(rowData, 'Ditolak'),
+                                command: () => finalStatus(NK_AES, 'Ditolak'),
                             },
                         ],
                     },
@@ -175,7 +176,7 @@ const Dashboard = () => {
                                 label: 'Bukti Bayar',
                                 icon: 'pi pi-reply',
                                 command: () => {
-                                window.location.href = `/bukti-bayar/${rowData.nomor_kontrak}`;
+                                window.location.href = `/bukti-bayar/${NK_AES}`;
                                 },
                             },
                         ],
@@ -215,16 +216,16 @@ const Dashboard = () => {
                     pt={{ action: { className: 'gap-2' } }} 
                     model={items} 
                     popup 
-                    ref={(el) => menuRefs.current[rowData.nomor_kontrak] = el} 
-                    id={`popup_menu_${rowData.nomor_kontrak}`} 
+                    ref={(el) => menuRefs.current[NK_AES] = el} 
+                    id={`popup_menu_${NK_AES}`} 
                     popupAlignment="right" 
                 />
                 <Button 
                     label="Update" 
                     icon="pi pi-spin pi-cog" 
                     className="w-full"
-                    onClick={(event) => menuRefs.current[rowData.nomor_kontrak].toggle(event)}
-                    aria-controls={`popup_menu_${rowData.nomor_kontrak}`} 
+                    onClick={(event) => menuRefs.current[NK_AES].toggle(event)}
+                    aria-controls={`popup_menu_${NK_AES}`} 
                     aria-haspopup
                 />
             </>

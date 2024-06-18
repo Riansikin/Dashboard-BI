@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const collectionName = "bukti_bayar";
 const AudithLog = require("../model/AudithLog");
 const UserModel = require("../model/UserModel");
+const encrypt = require('../utils/ecnrypt');
 const BuktiBayarModel = require("../model/BuktiBayarModel");
 const { Z_ASCII } = require('zlib');
 const { response } = require('express');
@@ -15,7 +16,7 @@ module.exports = {
 
     getBuktiBayar : async (req, res) => {
 
-        const { id } = req.params;  
+        const id = encrypt.decryptData(req.params.id);  
         try {
             const result = await BuktiBayarModel.findOne(
                 {nomor_kontrak : id},
@@ -57,11 +58,8 @@ module.exports = {
     createBuktiBayar : async ( req, res) => {
 
         try {
-            const nomor_kontrak = req.params.id;
+            const nomor_kontrak = encrypt.decryptData(req.params.id);
             const { id } = req.userData;
-
-
-            console.log(id, nomor_kontrak);
 
             if(!req.file){
                 console.log("POST /new-bukti-bayar --- Bad Request (400)");
@@ -116,7 +114,7 @@ module.exports = {
         }
     },
     downloadFileBuktiBayar : async ( req , res) => {
-        const { id } = req.params;
+        const id = encrypt.decryptData(req.params.id);
 
         try {
             const BuktiBayarData = await BuktiBayarModel.findOne({nomor_kontrak : id});

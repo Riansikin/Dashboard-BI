@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import useUser from "../useUser.jsx";
 import { useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { InputNumber } from 'primereact/inputnumber';
+// import { InputNumber } from 'primereact/inputnumber';
+import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
@@ -15,6 +16,7 @@ import BuktiBayarbyId from "../services/getBuktiBayarbyid.jsx";
 import newBuktiBayar from "../services/newBuktiBayar.jsx";
 import DownloadBuktiBayar from "../services/downloadBuktiBayar.jsx";
 import ForbiddenPage from "./Forbidden.jsx";
+import { encryptAES } from "../utils/cryptoUtils.js";
 
 export default function BuktiBayar({match}){
     const { user } = useUser();
@@ -37,9 +39,9 @@ export default function BuktiBayar({match}){
             nama_rekanan : '',
             nama_pekerjaan : '',
             nilai_kontrak : null,
+            jangka_waktu : null,
             nilai_tagihan : null,
             tanggal_mulai : '',
-            tanggal_akhir : '',
             status : '',
             dokumen_bukti : null,
             dokumen : null,
@@ -133,9 +135,9 @@ export default function BuktiBayar({match}){
                 setValue('nama_rekanan', dataBeritaAcara.nama_rekanan);
                 setValue('nama_pekerjaan', dataBeritaAcara.nama_pekerjaan);
                 setValue('nilai_kontrak', dataBeritaAcara.nilai_kontrak);
+                setValue('jangka_waktu', dataBeritaAcara.jangka_waktu);
                 setValue('nilai_tagihan', dataBeritaAcara.nilai_tagihan);
                 setValue('tanggal_mulai', new Date(dataBeritaAcara.periode_penagihan.mulai));
-                setValue('tanggal_akhir', new Date(dataBeritaAcara.periode_penagihan.akhir));
                 setValue('dokumen', dataBeritaAcara.dokumen.split("/")[4]);
                 setValue('status', dataBeritaAcara.status);
                 setFile(data => ({
@@ -170,35 +172,21 @@ export default function BuktiBayar({match}){
     }, [id, setValue, toast]);
 
     const handleDownloadBeritaAcara = async () => {
-        try {
-            await DownloadBeritaAcara(id);
-        } catch (error) {
-            console.error(error.message);
-            toast.current.show({
-                severity: 'error', 
-                summary: 'Error', 
-                detail: "Server Dalam Gangguan" 
-            }); 
-        }
+        const response  = await DownloadBeritaAcara(id);
+
+        toast.current.show({ severity: response.status, summary: response.status === 'error' ? 'Error' : 'Success', detail: response.response });
     }
     const handleDownloadBuktiBayar = async () => {
-        try {
-            await DownloadBuktiBayar(id);
-        } catch (error) {
-            console.error(error.message);
-            toast.current.show({
-                severity: 'error', 
-                summary: 'Error', 
-                detail: "Server Dalam Gangguan" 
-            }); 
-        }
+
+        const response = await DownloadBuktiBayar(id)
+        toast.current.show({ severity: response.status, summary: response.status === 'error' ? 'Error' : 'Success', detail: response.response });
     }
 
     const onSearch = async (data) => {
         try {
-            const response = await BeritaAcarabyId(data.nomor_kontrak);
+            const response = await BeritaAcarabyId(encryptAES(data.nomor_kontrak));
             if(response.status === 'success'){
-                window.location.href = `/bukti-bayar/${data.nomor_kontrak}`
+                window.location.href = `/bukti-bayar/${encryptAES(data.nomor_kontrak)}`
             }else{
                 toast.current.show({ 
                     severity: response.status, 
@@ -281,10 +269,10 @@ export default function BuktiBayar({match}){
                                     rules={{ required: 'Nomor kontrak is required' }}
                                     render={({ field }) => (
                                         <>
-                                            <InputNumber maxLength={13} value={field.value} 
+                                            <InputText value={field.value} 
                                             inputStyle={{ textAlign: 'center' }}
                                             onChange={(e) => {
-                                                setValue('nomor_kontrak', e.value);
+                                                setValue('nomor_kontrak', e.target.value);
                                             }}  useGrouping={false}
                                             />
                                             <small>{errors.nomor_kontrak && <span>{errors.nomor_kontrak.message}</span>}</small>

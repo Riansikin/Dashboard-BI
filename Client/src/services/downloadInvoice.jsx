@@ -17,6 +17,15 @@ const DownloadInvoice = async (id) => {
         });
         const response  = await instance.get(`download-invoice/${id}`);
 
+        if(response.status >= 400){
+            const errorMsg = await response.data.text();
+            const errorObj = JSON.parse(errorMsg);
+            return { 
+                status: "error",
+                response: errorObj.show_msg || 'An error occurred while downloading the file.',
+            };
+        }
+
         if(response.data.type === "application/zip"){
             const url = URL.createObjectURL(response.data);
             const a = document.createElement('a');
@@ -40,6 +49,17 @@ const DownloadInvoice = async (id) => {
         return response;
     } catch (error) {
         console.error("Error : ",JSON.stringify(error.message));
+        if (error.message === "Network Error") {
+            console.warn("Network Error ignored");
+            return { 
+                status : "info",
+                response: "Menunggu Donwload File",
+            };
+        }
+        return { 
+            status: "error",
+            response: "Ada kesalahan dalam mengambil file",
+        };
     }
 
 }
