@@ -1,3 +1,3 @@
 export const API = {
-    apiBaseUrl: 'http://172.20.10.6:1112/api/v1/'
+    apiBaseUrl: 'http://192.168.1.5:1113/api/v1/'
 };
